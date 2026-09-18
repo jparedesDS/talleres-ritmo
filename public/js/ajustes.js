@@ -177,7 +177,7 @@ function lineasEstadoCopia(aj) {
   const fuera = [];
   const carpeta = String(aj.carpeta_copias || '').trim();
   fuera.push(el('h4', { texto: 'Estado', estilo: { margin: '16px 0 6px' } }));
-  fuera.push(el('p', { clase: 'sutil', texto: 'Copia en este equipo: cada día, en la carpeta datos\copias (se guardan 30 días).' }));
+  fuera.push(el('p', { clase: 'sutil', texto: 'Copia en este equipo: cada día, en la carpeta datos\\copias (se guardan 30 días).' }));
 
   if (!carpeta) {
     fuera.push(el('p', { clase: 'aviso-linea', texto: 'No hay copia fuera de este equipo. Si se estropea este ordenador, se pierden los datos y las copias.' }));
