@@ -8,6 +8,9 @@ datos/
 *.db-wal
 *.db-shm
 
+# La base de demostración sí se sube: son datos inventados.
+!demo/taller-demo.db
+
 # Windows
 Thumbs.db
 desktop.ini

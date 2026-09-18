@@ -101,6 +101,21 @@ La opción 2 del mismo archivo los borra. Solo toca lo que él mismo creó —lo
 marca con la etiqueta `[EJEMPLO]` en las notas—, así que nunca se lleva por
 delante datos reales del taller.
 
+### Base de datos de demostración
+
+En la carpeta `demo/` hay una base de datos completa de prueba —4 clientes,
+5 vehículos, 16 citas y su historial, **todo inventado**— para ver el programa
+en marcha sin escribir nada.
+
+Se instala con doble clic en **`DATOS-DE-DEMOSTRACION.bat`** (o
+`node herramientas/usar-demo.js`). Al instalarla, las citas se desplazan a la
+semana en curso, de modo que el panel del día y la agenda tienen contenido sea
+cual sea la fecha.
+
+Si ya existe una base de datos propia, **no la toca**: avisa y se detiene. Para
+sustituirla hay que añadir `--forzar`, y aun así guarda antes una copia de la
+anterior. Se entra con `admin` / `admin`, y pedirá cambiar la contraseña.
+
 ---
 
 ## 2. Cómo se usa
@@ -168,6 +183,10 @@ Todo se guarda en un único fichero: **`datos/taller.db`** (SQLite).
 
 Desde *Informes* se pueden exportar las citas de un periodo a **CSV** para
 abrirlas en Excel.
+
+> La carpeta `datos/` está excluida del repositorio (`.gitignore`): los datos
+> del taller no se suben nunca a GitHub. Si el programa no la encuentra, la
+> crea vacía al arrancar.
 
 ---
 
