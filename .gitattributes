@@ -1,0 +1,9 @@
+# Los .bat y los .txt para Notepad tienen que conservar los finales de línea de
+# Windows (CRLF) o dejan de funcionar / se ven en una sola línea.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.txt text eol=crlf
+
+*.png binary
+*.ico binary
+*.db binary

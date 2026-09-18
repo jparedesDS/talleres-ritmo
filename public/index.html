@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestión de citas · Ritmo Talleres</title>
+  <meta name="theme-color" content="#1e1e1e" />
+  <link rel="icon" href="/img/favicon.ico" />
+  <link rel="stylesheet" href="/css/estilos.css" />
+</head>
+<body>
+  <div id="cargando" class="pantalla-carga">Cargando…</div>
+
+  <!-- Pantalla de acceso -->
+  <div id="login" class="pantalla-login oculto">
+    <form id="form-login" class="tarjeta-login">
+      <img class="logo-login" src="/img/logo-ritmo.png" alt="Ritmo Talleres" id="login-logo" />
+      <h1>Gestión de citas</h1>
+      <label>Usuario
+        <input name="usuario" autocomplete="username" required autofocus />
+      </label>
+      <label>Contraseña
+        <input name="clave" type="password" autocomplete="current-password" required />
+      </label>
+      <p id="login-error" class="error oculto"></p>
+      <button class="btn btn-primario" type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <!-- Aplicación -->
+  <div id="app" class="app oculto">
+    <aside class="lateral">
+      <div class="marca">
+        <img src="/img/logo-ritmo.png" alt="Ritmo Talleres" id="marca-logo" />
+        <span class="marca-sub">Gestión de citas</span>
+      </div>
+      <nav id="menu">
+        <a href="#/panel" data-vista="panel"><span>📋</span> Panel</a>
+        <a href="#/agenda" data-vista="agenda"><span>📅</span> Agenda</a>
+        <a href="#/citas" data-vista="citas"><span>🗂️</span> Citas</a>
+        <a href="#/clientes" data-vista="clientes"><span>👥</span> Clientes</a>
+        <a href="#/vehiculos" data-vista="vehiculos"><span>🚗</span> Vehículos</a>
+        <a href="#/informes" data-vista="informes"><span>📈</span> Informes</a>
+        <a href="#/ajustes" data-vista="ajustes"><span>⚙️</span> Ajustes</a>
+      </nav>
+      <div class="lateral-pie">
+        <div id="conexion" class="conexion desconectado" title="Conectando…"><span class="punto"></span> Conectando…</div>
+        <div id="usuario-actual" class="sutil"></div>
+        <button id="btn-salir" class="btn btn-plano">Salir</button>
+      </div>
+    </aside>
+
+    <main class="principal">
+      <header class="cabecera">
+        <button id="btn-menu" class="btn btn-plano solo-movil">☰</button>
+        <div class="buscador">
+          <input id="buscador" type="search" placeholder="Buscar matrícula, cliente o teléfono…" autocomplete="off" />
+          <div id="resultados-busqueda" class="resultados oculto"></div>
+        </div>
+        <button id="btn-nueva-cita" class="btn btn-primario oculto">+ Nueva cita</button>
+      </header>
+      <section id="vista" class="vista"></section>
+    </main>
+  </div>
+
+  <div id="capa-modal" class="capa-modal oculto"></div>
+  <div id="avisos" class="avisos"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

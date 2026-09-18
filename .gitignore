@@ -1,0 +1,24 @@
+# Base de datos y copias de seguridad.
+# NUNCA deben subirse: contienen datos reales de clientes y vehículos.
+# El programa vuelve a crear esta carpeta solo al arrancar.
+datos/
+
+# Archivos temporales de SQLite (por si algún día cambia la ruta de datos)
+*.db
+*.db-wal
+*.db-shm
+
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node (este proyecto no usa dependencias, pero por si acaso)
+node_modules/
+npm-debug.log*
