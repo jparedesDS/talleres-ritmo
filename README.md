@@ -209,9 +209,72 @@ abrirlas en Excel.
 > del taller no se suben nunca a GitHub. Si el programa no la encuentra, la
 > crea vacía al arrancar.
 
+### Copia fuera del equipo (importante)
+
+Las copias de `datos/copias/` están **en el mismo disco que el original**: si
+ese ordenador se estropea, se pierden las dos cosas a la vez.
+
+En *Ajustes → Copias* se puede indicar una **carpeta de copia externa**. A
+partir de ahí, cada copia diaria se guarda también allí. Sirve cualquier ruta
+completa:
+
+| Dónde                                    | Protege de                       |
+| ---------------------------------------- | -------------------------------- |
+| Otro PC del taller (`\\RECEPCION2\copias`) | Que se estropee este ordenador   |
+| Un USB o disco fijo (`D:\copias-taller`)  | Lo mismo, y es lo más sencillo   |
+| Una carpeta de OneDrive o Drive          | Robo, incendio o inundación      |
+
+El botón **Hacer una copia ahora** comprueba en el momento que la carpeta
+existe y que se puede escribir en ella.
+
+Si un día no se puede copiar (el USB desenchufado, la red caída), el programa
+**sigue funcionando con normalidad** y lo apunta; si pasan más de tres días sin
+conseguirlo, avisa en el *Panel*. Una copia que falla en silencio es peor que
+no tener ninguna.
+
 ---
 
-## 4. Detalles técnicos
+## 4. Mantenimiento
+
+Esta parte es para quien cuida el programa, no para el taller.
+
+### Comprobar que todo funciona
+
+Doble clic en **`PROBAR.bat`** (o `node herramientas/pruebas.js`).
+
+Arranca el programa con una base de datos vacía en una carpeta temporal y otro
+puerto, y comprueba por su cuenta unas sesenta cosas: que sin contraseña no se
+entra, que un mecánico no puede anular una cita, que cambiar un coche de dueño
+arrastra sus citas abiertas, que una matrícula con espacios se encuentra, que
+la copia externa se escribe de verdad...
+
+**No toca ninguna base de datos real**, ni la de este equipo ni la del taller.
+Termina diciendo `TODO CORRECTO: 65 de 65` o señalando exactamente qué ha
+fallado.
+
+Conviene lanzarlo **antes de llevar una versión nueva al taller**: si algo se
+ha roto, sale aquí y no allí.
+
+### Actualizar el programa del taller
+
+El programa se desarrolla en un equipo y funciona en otro, así que actualizar
+es copiar la versión nueva **sin tocar la carpeta `datos`**, que es lo único
+insustituible.
+
+De eso se encarga **`ACTUALIZAR.bat`**, que se ejecuta desde la carpeta de la
+versión nueva:
+
+1. Pide la carpeta donde está instalado el programa (o se le pasa:
+   `ACTUALIZAR.bat "D:\TALLER"`).
+2. Comprueba que ahí hay de verdad una instalación.
+3. Guarda una copia completa de `datos` al lado, con la fecha en el nombre.
+4. Sustituye el programa, **excluyendo `datos`** y la base de demostración.
+
+Antes de lanzarlo hay que **cerrar el programa** en el equipo servidor (la
+ventana negra). Si algo sale mal, los datos de antes quedan en la carpeta
+`copia-datos-taller-…` que deja al lado.
+
+## 5. Detalles técnicos
 
 - Node.js con `node:sqlite`, `node:http` y `node:crypto`: **cero dependencias
   externas**, no hay que ejecutar `npm install`.

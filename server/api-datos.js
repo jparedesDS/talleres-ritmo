@@ -1,7 +1,9 @@
 'use strict';
 const {
   all, get, run, transaccion, leerAjustes, guardarAjuste, hashClave, AJUSTES_DEFECTO, ESTADOS_CERRADOS_SQL,
+  copiaCompleta, DIR_DATOS,
 } = require('./db');
+const path = require('node:path');
 const { noEncontrado, peticionMala, prohibido, conflicto } = require('./http');
 const U = require('./util');
 const auth = require('./auth');
@@ -159,6 +161,17 @@ function validarAjustes(a) {
   if (!['10', '15', '20', '30', '60'].includes(String(a.slot_min))) e('Intervalo de agenda no válido');
   const itv = U.aEntero(a.aviso_itv_dias);
   if (itv === null || itv < 1 || itv > 365) e('Los días de aviso de ITV deben estar entre 1 y 365');
+  const carpeta = String(a.carpeta_copias || '').trim();
+  if (carpeta) {
+    if (carpeta.length > 240) e('La ruta de la carpeta de copias es demasiado larga');
+    if (carpeta !== U.sinControl(carpeta)) e('La ruta de la carpeta de copias tiene caracteres no válidos');
+    if (!path.isAbsolute(carpeta) && !carpeta.startsWith('\\')) {
+      e('Escriba la ruta completa de la carpeta, por ejemplo D:\copias-taller o \\SERVIDOR\copias');
+    }
+    if (path.resolve(carpeta) === path.resolve(DIR_DATOS, 'copias')) {
+      e('Esa es la carpeta de copias de este mismo equipo: elija otra unidad u otro ordenador');
+    }
+  }
   if (!String(a.plantilla_recordatorio || '').trim()) e('La plantilla del recordatorio no puede estar vacía');
   if (String(a.plantilla_recordatorio).length > 1000) e('La plantilla del recordatorio es demasiado larga');
 }
@@ -417,6 +430,21 @@ function registrar(r) {
     delete aj.version_esquema;
     return aj;
   }, { permiso: 'configurar' });
+
+  // ---- Copias de seguridad ---------------------------------------------
+  // Hace una copia ahora mismo, para comprobar que la carpeta externa existe
+  // y que el programa puede escribir en ella.
+  r.post('/api/copias/probar', () => {
+    const carpeta = String(leerAjustes().carpeta_copias || '').trim();
+    const hecha = copiaCompleta();
+    const aj = leerAjustes();
+    if (!carpeta) return { local: hecha.local, externa: null, mensaje: 'Copia local hecha. No hay carpeta externa configurada.' };
+    if (!hecha.externa) {
+      const motivo = String(aj.copia_externa_error || '').split('|').slice(1).join('|') || 'no se pudo escribir';
+      throw peticionMala(`No se pudo copiar a "${carpeta}": ${motivo}`);
+    }
+    return { local: hecha.local, externa: hecha.externa, mensaje: `Copia guardada en ${hecha.externa}` };
+  }, { permiso: 'configurar', codigo: 200 });
 
   // ---- Usuarios --------------------------------------------------------
   r.get('/api/usuarios', () => auth.listarUsuarios(), { permiso: 'configurar' });

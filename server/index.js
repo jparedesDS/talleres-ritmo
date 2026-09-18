@@ -8,7 +8,7 @@ const {
 } = require('./http');
 const auth = require('./auth');
 const eventos = require('./eventos');
-const { RUTA_BD, copiaSeguridad, programarCopias, leerAjustes, citasReparadas, get } = require('./db');
+const { RUTA_BD, copiaCompleta, programarCopias, leerAjustes, citasReparadas, get } = require('./db');
 const U = require('./util');
 
 const PUERTO = Number(process.env.PUERTO || process.env.PORT || 4400);
@@ -215,8 +215,14 @@ servidor.listen(PUERTO, HOST, () => {
   console.log(`  En este equipo:   http://localhost:${PUERTO}`);
   for (const ip of ipsLocales()) console.log(`  Desde la red:     http://${ip}:${PUERTO}`);
   console.log(`  Base de datos:    ${RUTA_BD}`);
-  const copia = copiaSeguridad();
-  if (copia) console.log(`  Copia del día:    ${copia}`);
+  const copia = copiaCompleta();
+  if (copia.local) console.log(`  Copia del día:    ${copia.local}`);
+  const carpetaFuera = String(leerAjustes().carpeta_copias || '').trim();
+  if (carpetaFuera) {
+    console.log(copia.externa
+      ? `  Copia fuera:      ${copia.externa}`
+      : `  ATENCIÓN:         no se pudo copiar a "${carpetaFuera}" (¿disco o red desconectados?)`);
+  }
   programarCopias();
   if (citasReparadas) console.log(`  Reparadas:        ${citasReparadas} cita(s) con el cliente desactualizado`);
   const provisionales = get('SELECT COUNT(*) AS n FROM usuarios WHERE activo = 1 AND debe_cambiar_clave = 1').n;

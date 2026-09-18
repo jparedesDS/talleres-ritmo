@@ -19,6 +19,7 @@ export async function vistaAjustes(contenedor) {
     Servicios: () => seccionServicios(recargar),
     'Bahías y mecánicos': () => seccionRecursos(recargar),
     Avisos: () => seccionAvisos(aj, esAdmin, recargar),
+    Copias: () => seccionCopias(aj, esAdmin, recargar),
     Usuarios: () => seccionUsuarios(esAdmin, recargar),
   };
 
@@ -123,6 +124,82 @@ function seccionAvisos(aj, esAdmin, recargar) {
   return tarjetaFormulario('Avisos al cliente', form, esAdmin, () =>
     guardarAjustes(Object.fromEntries(new FormData(form)), recargar)
   );
+}
+
+function seccionCopias(aj, esAdmin, recargar) {
+  const form = el(
+    'form',
+    { clase: 'formulario', onsubmit: (e) => e.preventDefault() },
+    el('label', { clase: 'ancho-total' },
+      'Carpeta de copia externa',
+      el('input', {
+        name: 'carpeta_copias',
+        value: aj.carpeta_copias || '',
+        placeholder: 'D:\\copias-taller   o   \\\\RECEPCION2\\copias',
+      })),
+    el('div', { clase: 'ancho-total sutil' },
+      'Cada día se guarda ahí una segunda copia, además de la de este equipo. ',
+      'Escriba la ruta completa de un disco USB, de otro ordenador del taller o de una carpeta de OneDrive. ',
+      'Déjelo vacío para no hacer copia fuera.')
+  );
+
+  const estadoCopia = el('div', { clase: 'ancho-total' }, ...lineasEstadoCopia(aj));
+
+  const probar = el('button', {
+    clase: 'btn',
+    texto: 'Hacer una copia ahora',
+    onclick: async () => {
+      probar.disabled = true;
+      probar.textContent = 'Copiando…';
+      try {
+        const r = await api.probarCopia();
+        aviso(r.mensaje, 'ok');
+        recargar();
+      } catch (e) {
+        aviso(e.message, 'mal');
+      } finally {
+        probar.disabled = false;
+        probar.textContent = 'Hacer una copia ahora';
+      }
+    },
+  });
+
+  const tarjeta = tarjetaFormulario('Copias de seguridad', form, esAdmin, () =>
+    guardarAjustes(Object.fromEntries(new FormData(form)), recargar)
+  );
+  tarjeta.append(estadoCopia);
+  if (esAdmin) tarjeta.append(el('div', { estilo: { marginTop: '10px' } }, probar));
+  return tarjeta;
+}
+
+/** Resumen legible de cómo va la copia externa. */
+function lineasEstadoCopia(aj) {
+  const fuera = [];
+  const carpeta = String(aj.carpeta_copias || '').trim();
+  fuera.push(el('h4', { texto: 'Estado', estilo: { margin: '16px 0 6px' } }));
+  fuera.push(el('p', { clase: 'sutil', texto: 'Copia en este equipo: cada día, en la carpeta datos\copias (se guardan 30 días).' }));
+
+  if (!carpeta) {
+    fuera.push(el('p', { clase: 'aviso-linea', texto: 'No hay copia fuera de este equipo. Si se estropea este ordenador, se pierden los datos y las copias.' }));
+    return fuera;
+  }
+
+  const error = String(aj.copia_externa_error || '');
+  const ultima = String(aj.copia_externa_ultima || '');
+  if (error) {
+    fuera.push(el('p', { clase: 'aviso-linea', texto: `No se pudo copiar a "${carpeta}": ${error.split('|').slice(1).join('|')}` }));
+  }
+  if (ultima) {
+    const f = new Date(ultima);
+    const dias = Math.floor((Date.now() - f.getTime()) / 86400000);
+    fuera.push(el('p', {
+      clase: dias > 3 ? 'aviso-linea' : 'sutil',
+      texto: `Última copia fuera: ${f.toLocaleString('es-ES')}${dias > 3 ? ` · hace ${dias} días` : ''}`,
+    }));
+  } else if (!error) {
+    fuera.push(el('p', { clase: 'sutil', texto: 'Todavía no se ha hecho ninguna copia fuera. Pulse "Hacer una copia ahora" para comprobar que la carpeta funciona.' }));
+  }
+  return fuera;
 }
 
 function tarjetaFormulario(titulo, form, habilitado, alGuardar) {

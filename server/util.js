@@ -138,6 +138,7 @@ module.exports = {
   esFechaISO,
   esHora,
   normalizarMatricula,
+  sinControl,
   limpiarTexto,
   aEntero,
   aDecimal,

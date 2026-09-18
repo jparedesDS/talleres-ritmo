@@ -164,6 +164,9 @@ const AJUSTES_DEFECTO = {
   dias_laborables: '1,2,3,4,5',
   slot_min: '30',
   aviso_itv_dias: '30',
+  // Segunda copia fuera de este equipo (otro PC, un USB, una carpeta de red).
+  // Se rellena en el taller desde Ajustes; vacío = solo copia local.
+  carpeta_copias: '',
   plantilla_recordatorio:
     'Hola {cliente}, le recordamos su cita en {taller} el {fecha} a las {hora} para {servicio} ({matricula}). Si no puede venir, avísenos al {telefono_taller}. Gracias.',
 };
@@ -365,12 +368,45 @@ function copiaSeguridad(diasAConservar = 30) {
 }
 
 /** Repite la copia cada hora: si el programa lleva días abierto, cada día tiene la suya. */
+/**
+ * Duplica una copia ya hecha en la carpeta externa configurada. Si falla (USB
+ * desenchufado, red caída) se anota y se sigue: una copia que no se puede
+ * hacer nunca debe impedir que el taller trabaje.
+ *
+ * No borra nada en esa carpeta: son unos pocos KB al día y ahí puede haber
+ * cosas que no son nuestras.
+ */
+function copiarFuera(origen) {
+  const carpeta = String(leerAjustes().carpeta_copias || '').trim();
+  if (!carpeta || !origen) return null;
+  try {
+    fs.mkdirSync(carpeta, { recursive: true });
+    const destino = path.join(carpeta, path.basename(origen));
+    fs.copyFileSync(origen, destino);
+    guardarAjuste('copia_externa_ultima', new Date().toISOString());
+    guardarAjuste('copia_externa_error', '');
+    return destino;
+  } catch (e) {
+    guardarAjuste('copia_externa_error', `${new Date().toISOString()}|${e.message}`);
+    console.error(`[copia externa] no se pudo copiar a "${carpeta}": ${e.message}`);
+    return null;
+  }
+}
+
+/** Copia local + copia fuera, para el arranque y para el botón de Ajustes. */
+function copiaCompleta(diasAConservar = 30) {
+  const local = copiaSeguridad(diasAConservar);
+  return { local, externa: copiarFuera(local) };
+}
+
 function programarCopias() {
-  setInterval(() => copiaSeguridad(), 60 * 60 * 1000).unref();
+  setInterval(() => copiaCompleta(), 60 * 60 * 1000).unref();
 }
 
 module.exports = {
   copiaSeguridad,
+  copiaCompleta,
+  copiarFuera,
   programarCopias,
   citasReparadas,
   ESTADOS_CERRADOS_SQL,

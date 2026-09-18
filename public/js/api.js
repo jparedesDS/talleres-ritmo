@@ -94,6 +94,7 @@ export const api = {
   borrarServicio: (id) => peticion('DELETE', `/api/servicios/${id}`),
 
   ajustes: () => peticion('GET', '/api/ajustes'),
+  probarCopia: () => peticion('POST', '/api/copias/probar'),
   guardarAjustes: (d) => peticion('PUT', '/api/ajustes', d),
 
   usuarios: () => peticion('GET', '/api/usuarios'),

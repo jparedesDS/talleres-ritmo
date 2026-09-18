@@ -444,6 +444,13 @@ tbody tr:hover { background: var(--marca-lima-suave); }
 .conexion.desconectado .punto { background: var(--ambar); box-shadow: 0 0 0 3px rgba(201, 106, 0, .25); animation: parpadeo 1.2s infinite; }
 @keyframes parpadeo { 50% { opacity: .35; } }
 
+/* Aviso dentro de una tarjeta (copias que fallan, por ejemplo) */
+.aviso-linea {
+  background: var(--ambar-suave); border: 1px solid var(--ambar-borde); color: var(--ambar-texto);
+  border-left: 4px solid var(--ambar); border-radius: 6px; padding: 8px 10px; margin: 6px 0 0;
+  font-size: .88rem;
+}
+
 /* ---------- Impresión ---------- */
 @media print {
   .lateral, .cabecera, .aviso-clave, .avisos, .agenda-barra, .btn { display: none !important; }

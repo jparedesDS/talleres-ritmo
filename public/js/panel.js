@@ -6,6 +6,29 @@ import {
   el, vaciar, aviso, fmtFecha, fmtFechaCorta, diasHasta, chapaEstado, matricula, duracionTexto,
 } from './util.js';
 
+/**
+ * Aviso cuando la copia de seguridad fuera de este equipo no se está haciendo.
+ * Una copia que falla en silencio es peor que no tenerla, así que se ve en la
+ * primera pantalla que se mira por la mañana.
+ */
+function avisoCopias() {
+  if (!puede('configurar')) return null;
+  const aj = estado.ajustes || {};
+  const carpeta = String(aj.carpeta_copias || '').trim();
+  if (!carpeta) return null;
+
+  const error = String(aj.copia_externa_error || '');
+  const ultima = aj.copia_externa_ultima ? new Date(aj.copia_externa_ultima) : null;
+  const dias = ultima ? Math.floor((Date.now() - ultima.getTime()) / 86400000) : null;
+  if (!error && dias !== null && dias <= 3) return null;
+
+  const texto = error
+    ? `La copia de seguridad en "${carpeta}" está fallando. Compruebe que el disco o la carpeta de red están conectados.`
+    : `Hace ${dias === null ? 'mucho' : dias} día(s) que no se guarda copia en "${carpeta}".`;
+  return el('div', { clase: 'aviso-linea', estilo: { marginBottom: '14px' } }, texto,
+    ' ', el('a', { href: '#/ajustes', texto: 'Ver copias' }));
+}
+
 export async function vistaPanel(contenedor) {
   // "Cargando…" solo si la pantalla está vacía: al refrescar se sustituye sin parpadeo
   if (!contenedor.firstChild) contenedor.append(el('p', { clase: 'sutil', texto: 'Cargando…' }));
@@ -68,6 +91,7 @@ export async function vistaPanel(contenedor) {
   );
 
   vaciar(contenedor).append(
+    avisoCopias(),
     kpis,
     el('div', { clase: 'panel-rejilla' }, hoy, el('div', { clase: 'rejilla' }, porConfirmar, avisosItv)),
     el('div', { estilo: { marginTop: '14px' } }, proximas)
