@@ -1,6 +1,7 @@
 // Informes: ocupación, estados, servicios más pedidos y tasa de ausencias.
 import { api } from './api.js';
-import { alRefrescar } from './estado.js';
+import { alRefrescar, estado } from './estado.js';
+import { colorEstado, colorLibre } from './tema.js';
 import { el, vaciar, hoyISO, sumarDias, fmtFecha, duracionTexto, aviso } from './util.js';
 
 export async function vistaInformes(contenedor) {
@@ -27,13 +28,13 @@ export async function vistaInformes(contenedor) {
           etiqueta: b.bahia,
           valor: b.porcentaje,
           texto: `${b.porcentaje}% · ${duracionTexto(b.minutos)}`,
-          color: b.color,
+          color: colorLibre(b.color),
         })), 100),
         tarjetaBarras('Citas por estado', d.porEstado.filter((e) => e.n).map((e) => ({
           etiqueta: e.etiqueta,
           valor: e.n,
           texto: String(e.n),
-          color: e.color,
+          color: colorEstado(e.estado, estado.estados).fondo,
         })), Math.max(1, ...d.porEstado.map((e) => e.n))),
         tarjetaBarras('Servicios más pedidos', d.porServicio.slice(0, 10).map((s) => ({
           etiqueta: s.servicio,

@@ -1,5 +1,6 @@
 // Estado compartido por toda la aplicación (datos que casi no cambian).
 import { api } from './api.js';
+import { colorLibre } from './tema.js';
 
 export const estado = {
   usuario: null,
@@ -34,7 +35,7 @@ export async function cargarMaestros() {
 }
 
 export const nombreServicio = (id) => (estado.servicios.find((s) => s.id === id) || {}).nombre || '';
-export const colorServicio = (id) => (estado.servicios.find((s) => s.id === id) || {}).color || '#4e4e4e';
+export const colorServicio = (id) => colorLibre((estado.servicios.find((s) => s.id === id) || {}).color);
 
 // ---------------------------------------------------------------------------
 // Refresco de la pantalla actual
@@ -49,6 +50,9 @@ let repetir = false;
 export function alRefrescar(fn) {
   refrescoVista = fn;
 }
+
+/** ¿La vista en pantalla sabe recargarse sola? */
+export const hayRefresco = () => !!refrescoVista;
 
 export async function refrescarVista() {
   if (!refrescoVista) return;

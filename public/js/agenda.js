@@ -6,6 +6,7 @@ import {
   el, vaciar, aviso, confirmar, hoyISO, sumarDias, fmtFechaLarga, fmtFechaCorta, lunesDe,
   aMinutos, aHora, duracionTexto, textoSobre,
 } from './util.js';
+import { colorEstado, colorLibre } from './tema.js';
 
 const PX_MIN = 1.15;
 let modo = 'dia';
@@ -171,7 +172,7 @@ async function pintarDia(zona) {
       { clase: 'col-bahia' },
       el(
         'div',
-        { clase: 'col-cabecera', estilo: { borderTop: `3px solid ${col.color}` } },
+        { clase: 'col-cabecera', estilo: { borderTop: `3px solid ${colorLibre(col.color)}` } },
         el('span', { texto: col.nombre }),
         ocup ? el('span', { clase: 'ocupacion', texto: `${ocup.porcentaje}%` }) : null
       ),
@@ -235,23 +236,25 @@ async function mover(id, datos, forzar = false) {
 
 function tarjetaCita(c, apertura) {
   const inicio = aMinutos(c.hora_inicio);
-  const color = c.servicio_color || c.bahia_color || '#4e4e4e';
+  const color = colorLibre(c.servicio_color || c.bahia_color);
+  const est = colorEstado(c.estado, estado.estados);
   const finalizada = ['entregada', 'anulada', 'no_presentado'].includes(c.estado);
+  const anulada = c.estado === 'anulada';
   const nodo = el(
     'div',
     {
-      clase: `cita ${finalizada ? 'finalizada' : ''}`,
+      clase: `cita ${finalizada ? 'finalizada' : ''} ${est.rayado ? 'rayada' : ''}`,
       draggable: puede('gestionar') ? 'true' : null,
       estilo: {
         top: `${(inicio - apertura) * PX_MIN}px`,
         height: `${Math.max(22, c.duracion_min * PX_MIN - 3)}px`,
-        background: c.estado === 'anulada' ? '#9a9a9a' : color,
-        color: c.estado === 'anulada' ? '#fff' : textoSobre(color),
-        borderLeftColor: (estado.estados[c.estado] || {}).color || 'rgba(0,0,0,.3)',
+        background: anulada ? est.fondo : color,
+        color: textoSobre(anulada ? est.fondo : color),
+        borderLeftColor: est.fondo,
       },
       title: `${c.hora_inicio} · ${c.matricula || ''} · ${c.titulo || ''} · ${(estado.estados[c.estado] || {}).etiqueta}`,
     },
-    el('div', { clase: 'punto-estado', estilo: { background: (estado.estados[c.estado] || {}).color } }),
+    el('div', { clase: 'punto-estado', estilo: { background: est.fondo } }),
     el('div', {}, el('span', { clase: 'hora', texto: c.hora_inicio }), ' ', el('span', { clase: 'mat', texto: c.matricula || '' })),
     c.duracion_min >= 40 ? el('div', { clase: 'det', texto: c.titulo || c.servicio_nombre || '' }) : null,
     c.duracion_min >= 70 ? el('div', { clase: 'det', texto: `${c.cliente_nombre || ''}${c.espera ? ' ⏳' : ''}` }) : null
@@ -300,10 +303,10 @@ async function pintarSemana(zona) {
     for (const c of dia.citas) {
       lista.append(
         el('div', {
-          clase: 'cita-mini',
+          clase: `cita-mini ${colorEstado(c.estado, estado.estados).rayado ? 'rayada' : ''}`,
           estilo: {
-            background: c.servicio_color || '#4e4e4e',
-            color: textoSobre(c.servicio_color || '#4e4e4e'),
+            background: colorLibre(c.servicio_color),
+            color: textoSobre(colorLibre(c.servicio_color)),
             opacity: ['entregada', 'anulada', 'no_presentado'].includes(c.estado) ? '.6' : '1',
           },
           onclick: () => fichaCita(c.id, { alCambiar: refrescar }),

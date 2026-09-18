@@ -40,7 +40,13 @@
   --acento-hover: var(--marca-lima-hover);
   --sobre-acento: #121212;
   --acento-texto: var(--marca-oliva);
-  --foco: 0 0 0 3px rgba(215, 255, 1, .65);
+  /* Detalles que caen sobre el marco oscuro (menú, cabecera, acceso): ahí el
+     acento tiene que ser claro, no oscuro. */
+  --acento-marco: var(--marca-lima);
+  --sobre-acento-marco: #121212;
+  --halo-acento: rgba(215, 255, 1, .65);
+  --halo-marco: rgba(215, 255, 1, .18);
+  --foco: 0 0 0 3px var(--halo-acento);
 
   /* --- Colores con significado --- */
   --verde: #1f8f4e;
@@ -62,6 +68,78 @@
   --px-min: 1.15; /* pixeles por minuto en la agenda */
 }
 
+/* ==========================================================================
+   Tema SOBRIO (monocromático)
+   Mismo programa sin un solo color: solo grises. Se activa con el botón de
+   apariencia y se guarda en cada equipo. Aquí solo se redefinen las variables
+   de arriba; ninguna regla de más abajo necesita saber en qué tema estamos.
+   ========================================================================== */
+:root[data-tema="sobrio"] {
+  --marca-lima: #3a3a38;
+  --marca-lima-hover: #232321;
+  --marca-lima-suave: #eaeae7;
+  --marca-oliva: #2f2f2d;
+
+  --acento: #3a3a38;
+  --acento-hover: #1f1f1e;
+  --sobre-acento: #ffffff;
+  --acento-texto: #2f2f2d;
+
+  --acento-marco: #dcdcd8;
+  --sobre-acento-marco: #1b1b1a;
+  --halo-acento: rgba(58, 58, 56, .30);
+  --halo-marco: rgba(220, 220, 216, .16);
+
+  /* Sin color, lo que avisa es el contraste y el grosor del borde. */
+  --verde: #4f4f4c;
+  --rojo: #1f1f1e;
+  --rojo-suave: #e6e6e2;
+  --rojo-borde: #9a9a95;
+  --rojo-texto: #1f1f1e;
+  --ambar: #5c5c59;
+  --ambar-suave: #eeeeea;
+  --ambar-borde: #bcbcb7;
+  --ambar-texto: #353533;
+  --info: #5c5c59;
+}
+
+/* La matrícula deja de llevar el filo azul. */
+:root[data-tema="sobrio"] .matricula { border-left-color: #4e4e4e; }
+
+/* Estados en los que el coche no llegó a entrar: se marcan con rayado, que se
+   distingue aunque no haya color (y también al imprimir en blanco y negro). */
+.chapa-rayada, .cita.rayada, .cita-mini.rayada {
+  background-image: repeating-linear-gradient(
+    135deg, rgba(255, 255, 255, .28) 0 4px, transparent 4px 9px);
+}
+:root[data-tema="sobrio"] .chapa { border: 1px solid rgba(0, 0, 0, .18); }
+
+/* El logotipo y los iconos son imágenes y emojis de colores: en sobrio se
+   apagan a gris, o el modo monocromático se quedaría a medias. */
+:root[data-tema="sobrio"] img,
+:root[data-tema="sobrio"] .lateral nav a span,
+:root[data-tema="sobrio"] .btn,
+:root[data-tema="sobrio"] .chapa,
+:root[data-tema="sobrio"] .cita,
+:root[data-tema="sobrio"] .cita-mini,
+:root[data-tema="sobrio"] td,
+:root[data-tema="sobrio"] .kpi { filter: grayscale(1); }
+
+/* Los botones principales que caen sobre el marco oscuro (acceso y cabecera)
+   necesitan el acento claro: en gris oscuro sobre antracita no se ven. */
+:root[data-tema="sobrio"] .tarjeta-login .btn-primario,
+:root[data-tema="sobrio"] .cabecera .btn-primario {
+  background: var(--acento-marco); border-color: var(--acento-marco); color: var(--sobre-acento-marco);
+}
+:root[data-tema="sobrio"] .tarjeta-login .btn-primario:hover,
+:root[data-tema="sobrio"] .cabecera .btn-primario:hover { background: #ffffff; border-color: #ffffff; }
+
+/* Excepción: en Ajustes el color de servicios y bahías ES el dato que se está
+   eligiendo, así que ahí se ve siempre de verdad aunque se trabaje en sobrio. */
+:root[data-tema="sobrio"] #vista[data-vista="ajustes"] td,
+:root[data-tema="sobrio"] #vista[data-vista="ajustes"] .chapa,
+:root[data-tema="sobrio"] input[type="color"] { filter: none; }
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -78,7 +156,7 @@ html, body {
 .error { color: var(--rojo); }
 a { color: var(--acento-texto); text-decoration: underline; text-decoration-color: var(--acento); text-underline-offset: 3px; }
 a:hover { color: var(--texto); }
-::selection { background: var(--marca-lima); color: var(--sobre-acento); }
+::selection { background: var(--acento); color: var(--sobre-acento); }
 
 /* ---------- Carga y acceso ---------- */
 .pantalla-carga {
@@ -87,13 +165,13 @@ a:hover { color: var(--texto); }
 .pantalla-login {
   display: grid; place-items: center; height: 100%;
   background:
-    radial-gradient(circle at 85% 12%, rgba(215, 255, 1, .10), transparent 38%),
+    radial-gradient(circle at 85% 12%, var(--halo-marco), transparent 38%),
     linear-gradient(160deg, var(--marco-fondo) 0%, #121212 100%);
 }
 .tarjeta-login {
   background: var(--marco-fondo-2); color: var(--marco-texto);
   padding: 34px 32px 30px; border-radius: 14px; width: min(370px, 92vw);
-  border: 1px solid var(--marco-borde); border-top: 4px solid var(--acento);
+  border: 1px solid var(--marco-borde); border-top: 4px solid var(--acento-marco);
   box-shadow: 0 24px 50px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 14px;
 }
 .tarjeta-login .logo-login { display: block; width: 190px; max-width: 100%; height: auto; margin: 0 auto 2px; }
@@ -102,7 +180,7 @@ a:hover { color: var(--texto); }
 .tarjeta-login input {
   background: var(--marco-fondo); border-color: var(--marco-borde); color: var(--marco-texto);
 }
-.tarjeta-login input:focus { border-color: var(--acento); }
+.tarjeta-login input:focus { border-color: var(--acento-marco); }
 .tarjeta-login .btn-primario { justify-content: center; margin-top: 4px; padding: 11px 14px; font-size: 1rem; }
 .tarjeta-login .error { color: #ff8f86; margin: 0; }
 
@@ -123,7 +201,7 @@ a:hover { color: var(--texto); }
   align-items: center; font-size: .94rem; text-decoration: none; border-left: 3px solid transparent;
 }
 .lateral nav a:hover { background: var(--marco-fondo-2); color: #fff; }
-.lateral nav a.activo { background: var(--acento); color: var(--sobre-acento); font-weight: 700; }
+.lateral nav a.activo { background: var(--acento-marco); color: var(--sobre-acento-marco); font-weight: 700; }
 .lateral nav a.activo span { filter: grayscale(1) brightness(.2); }
 .lateral-pie { border-top: 1px solid var(--marco-borde); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .lateral-pie .sutil { color: var(--marco-texto-sutil); padding: 0 6px; }
@@ -133,7 +211,7 @@ a:hover { color: var(--texto); }
 .principal { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .cabecera {
   display: flex; gap: 12px; align-items: center; padding: 10px 16px;
-  background: var(--marca-antracita); border-bottom: 3px solid var(--acento);
+  background: var(--marca-antracita); border-bottom: 3px solid var(--acento-marco);
 }
 .cabecera .btn-plano { color: var(--marco-texto); }
 .buscador { position: relative; flex: 1; max-width: 520px; }
@@ -141,7 +219,7 @@ a:hover { color: var(--texto); }
   width: 100%; background: var(--marco-fondo); border-color: var(--marco-borde); color: var(--marco-texto);
 }
 .buscador input::placeholder { color: var(--marco-texto-sutil); }
-.buscador input:focus { border-color: var(--acento); }
+.buscador input:focus { border-color: var(--acento-marco); }
 .resultados {
   position: absolute; top: 105%; left: 0; right: 0; background: var(--panel);
   border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: 0 12px 30px rgba(0,0,0,.25);
@@ -279,7 +357,7 @@ tbody tr:hover { background: var(--marca-lima-suave); }
 .dia-semana > header { padding: 7px 9px; border-bottom: 1px solid var(--borde); font-size: .82rem; font-weight: 700; }
 .dia-semana > header::first-letter { text-transform: uppercase; }
 .dia-semana.hoy { border-color: var(--marca-negro); }
-.dia-semana.hoy > header { background: var(--marca-negro); color: #fff; border-bottom: 3px solid var(--acento); }
+.dia-semana.hoy > header { background: var(--marca-negro); color: #fff; border-bottom: 3px solid var(--acento-marco); }
 .dia-semana.hoy > header .sutil { color: var(--marca-gris); }
 .dia-semana .lista { padding: 6px; display: flex; flex-direction: column; gap: 5px; overflow: auto; }
 .cita-mini { border-radius: 6px; padding: 4px 6px; color: #fff; font-size: .75rem; cursor: pointer; }
@@ -292,7 +370,7 @@ tbody tr:hover { background: var(--marca-lima-suave); }
 }
 .modal.ancho { width: min(1000px, 96vw); }
 .modal > header {
-  padding: 13px 18px; background: var(--marco-fondo); color: var(--marco-texto); border-bottom: 3px solid var(--acento);
+  padding: 13px 18px; background: var(--marco-fondo); color: var(--marco-texto); border-bottom: 3px solid var(--acento-marco);
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
 }
 .modal > header h3 { margin: 0; }
@@ -362,7 +440,7 @@ tbody tr:hover { background: var(--marca-lima-suave); }
 
 /* ---------- Indicador de conexión en directo ---------- */
 .conexion { display: flex; align-items: center; gap: 6px; padding: 0 6px; font-size: .75rem; color: var(--marco-texto-sutil); cursor: default; }
-.conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--acento); box-shadow: 0 0 0 3px rgba(215, 255, 1, .18); flex-shrink: 0; }
+.conexion .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--acento-marco); box-shadow: 0 0 0 3px var(--halo-marco); flex-shrink: 0; }
 .conexion.desconectado .punto { background: var(--ambar); box-shadow: 0 0 0 3px rgba(201, 106, 0, .25); animation: parpadeo 1.2s infinite; }
 @keyframes parpadeo { 50% { opacity: .35; } }
 

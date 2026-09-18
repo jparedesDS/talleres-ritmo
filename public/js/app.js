@@ -1,7 +1,8 @@
 // Arranque de la aplicación: acceso, menú, buscador global, navegación y
 // actualización en directo de las pantallas.
 import { api } from './api.js';
-import { estado, cargarMaestros, puede, alRefrescar, refrescarVista } from './estado.js';
+import { estado, cargarMaestros, puede, alRefrescar, refrescarVista, hayRefresco } from './estado.js';
+import { iniciarTema, alternarTema, temaActual, alCambiarTema, TEMAS } from './tema.js';
 import { el, $, $$, vaciar, aviso, debounce, hayModalAbierto, cerrarModales } from './util.js';
 import { vistaPanel } from './panel.js';
 import { vistaAgenda } from './agenda.js';
@@ -21,6 +22,30 @@ const VISTAS = {
 };
 
 const NOMBRES_ROL = { admin: 'Administrador', recepcion: 'Recepción', mecanico: 'Mecánico' };
+
+// ---------------------------------------------------------------------------
+// Apariencia
+// ---------------------------------------------------------------------------
+// El tema lo elige cada usuario en su equipo. Como los colores de las citas se
+// calculan al pintar, al cambiarlo hay que volver a dibujar la pantalla.
+function pintarBotonApariencia() {
+  const boton = $('#btn-apariencia');
+  if (!boton) return;
+  const otro = TEMAS[temaActual() === 'sobrio' ? 'color' : 'sobrio'];
+  boton.textContent = `◐ ${TEMAS[temaActual()].nombre}`;
+  boton.title = `Apariencia: ${TEMAS[temaActual()].descripcion}. Pulse para ver el taller en ${otro.nombre.toLowerCase()} (${otro.descripcion.toLowerCase()}).`;
+}
+
+alCambiarTema(() => {
+  pintarBotonApariencia();
+  if (!estado.usuario) return;
+  // refrescarVista conserva filtros y desplazamiento; si la vista no se sabe
+  // refrescar, se vuelve a montar entera.
+  if (hayRefresco()) refrescarVista();
+  else navegar();
+});
+
+$('#btn-apariencia').addEventListener('click', () => alternarTema());
 
 // ---------------------------------------------------------------------------
 // Acceso
@@ -387,6 +412,9 @@ document.addEventListener('keydown', (e) => {
     formularioCita();
   }
 });
+
+iniciarTema();
+pintarBotonApariencia();
 
 arrancar().catch((e) => {
   $('#cargando').textContent = `No se pudo conectar con el servidor: ${e.message}`;

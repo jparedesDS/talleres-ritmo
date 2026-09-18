@@ -1,4 +1,5 @@
 // Utilidades comunes: DOM, fechas, avisos y ventanas modales.
+import { colorEstado } from './tema.js';
 
 /**
  * Crea un elemento. Todo el contenido se inserta como TEXTO, nunca como HTML:
@@ -207,8 +208,15 @@ export function debounce(fn, ms = 250) {
 }
 
 export function chapaEstado(estado, estados) {
-  const info = estados[estado] || { etiqueta: estado, color: '#4e4e4e' };
-  return el('span', { clase: 'chapa', estilo: { background: info.color }, texto: info.etiqueta });
+  const info = estados[estado] || { etiqueta: estado };
+  const c = colorEstado(estado, estados);
+  const estilo = { background: c.fondo, color: textoSobre(c.fondo) };
+  if (c.borde) estilo.boxShadow = `inset 0 0 0 1px ${c.borde}`;
+  return el('span', {
+    clase: `chapa ${c.rayado ? 'chapa-rayada' : ''}`,
+    estilo,
+    texto: info.etiqueta || estado,
+  });
 }
 
 export function matricula(texto) {

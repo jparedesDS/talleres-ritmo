@@ -158,6 +158,27 @@ Atajos: `/` para ir al buscador y `Alt+N` para una cita nueva.
 - **Bahías y mecánicos**: las bahías son las columnas de la agenda.
 - **Usuarios**: altas, roles y contraseñas.
 
+### Apariencia
+
+Abajo a la izquierda, debajo del nombre de usuario, hay un botón que cambia
+entre dos apariencias:
+
+- **Color** — la imagen de Ritmo Talleres, con el lima de la marca.
+- **Sobrio** — todo en escala de grises, sin un solo color.
+
+En el modo sobrio los estados de la cita no se distinguen por el tono, así que
+se reparten por **claridad siguiendo el avance del trabajo**: *Pendiente* casi
+blanco, *En taller* gris medio, *Entregada* casi negro. *Anulada* y *No
+presentado* llevan además un rayado, que también se ve al imprimir en blanco y
+negro.
+
+Lo elige **cada usuario en su equipo** y se recuerda ahí: en el mismo taller
+uno puede trabajar en color y otro en gris. El cambio es inmediato, sin
+recargar ni perder lo que se esté mirando.
+
+La única excepción son los colores de servicios y bahías dentro de *Ajustes*:
+ahí se ven siempre de verdad, porque son el dato que se está eligiendo.
+
 ### Imagen de Ritmo Talleres
 El programa usa el logotipo, el icono y los colores de ritmotalleres.es:
 antracita `#1E1E1E`, gris `#4E4E4E` y amarillo lima `#D7FF01`.
